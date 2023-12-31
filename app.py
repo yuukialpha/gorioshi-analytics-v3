@@ -10,7 +10,7 @@ import matplotlib.backends.backend_agg
 
 app = flask.Flask(__name__)
 
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 600
 
 @app.route("/<key>/<email>/<zone_id>/<int:hours>")
 def index(key, email, zone_id, hours):
@@ -20,7 +20,7 @@ def index(key, email, zone_id, hours):
     })
     client = gql.Client(transport=transport)
 
-    query_text = pathlib.Path("query.txt").read_text()
+    query_text = pathlib.Path("query.txt").read_text("UTF-8")
     query = gql.gql(query_text)
     params = {
         "zoneTag": zone_id,
@@ -32,19 +32,29 @@ def index(key, email, zone_id, hours):
     result = client.execute(query, variable_values=params)
     first_group = result["viewer"]["zones"][0]["httpRequests1hGroups"]
 
-    y = [item["uniq"]["uniques"] for item in first_group]
-    x = range(-len(y),0)
+    ax1_y = [item["uniq"]["uniques"] for item in first_group]
+    ax1_x = range(-len(ax1_y)+1,0+1)
+    ax2_y = [item["sum"]["bytes"] for item in first_group]
+    ax2_x = range(-len(ax2_y)+1,0+1)
+    ax3_y = [item["sum"]["cachedBytes"] for item in first_group]
+    ax3_x = range(-len(ax3_y)+1,0+1)
 
     fig = matplotlib.figure.Figure()
-    ax = fig.add_subplot(111)
-    ax.plot(x, y)
+    fig.suptitle(f"Stats for {zone_id}")
+    fig.set_size_inches(7, 7)
+    ax1, ax2 = fig.subplots(2)
+    ax1.set_title("Users")
+    ax1.plot(ax1_x, ax1_y)
+    ax2.set_title("Bytes")
+    ax2.plot(ax2_x, ax2_y)
+    ax2.plot(ax3_x, ax3_y)
 
     canvas = matplotlib.backends.backend_agg.FigureCanvasAgg(fig)
     img = io.BytesIO()
     canvas.print_png(img)
     img.seek(0)
 
-    return flask.send_file(img, mimetype='image/png')
+    return flask.send_file(img, mimetype="image/png")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3000", debug=True)
