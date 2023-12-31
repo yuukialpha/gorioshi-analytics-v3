@@ -1,3 +1,4 @@
+import pathlib
 import datetime
 import io
 
@@ -9,6 +10,8 @@ import matplotlib.backends.backend_agg
 
 app = flask.Flask(__name__)
 
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 3600
+
 @app.route("/<key>/<email>/<zone_id>/<int:hours>")
 def index(key, email, zone_id, hours):
     transport = gql.transport.aiohttp.AIOHTTPTransport(url="https://api.cloudflare.com/client/v4/graphql", headers={
@@ -17,38 +20,7 @@ def index(key, email, zone_id, hours):
     })
     client = gql.Client(transport=transport)
 
-    query_text = """{
-  viewer {
-    zones ( filter: { zoneTag: $zoneTag } ) {
-      httpRequests1hGroups (
-        limit: $max,
-        filter: {
-          datetime_geq: $start,
-          datetime_lt: $end,
-        },
-        orderBy: [datetime_ASC]
-      ) {
-        sum {
-          bytes,
-          cachedBytes,
-          cachedRequests,
-          encryptedBytes,
-          encryptedRequests,
-          pageViews,
-          requests,
-          threats,
-        }
-        uniq {
-          uniques,
-        }
-        dimensions {
-          date,
-          datetime,
-        }
-      }
-    }
-  }
-}"""
+    query_text = pathlib.Path("query.txt").read_text()
     query = gql.gql(query_text)
     params = {
         "zoneTag": zone_id,
