@@ -36,8 +36,8 @@ def index(key, email, zone_id, hours):
     ax1_x = range(-len(ax1_y)+1,0+1)
     ax2_y = [item["sum"]["bytes"] for item in first_group]
     ax2_x = range(-len(ax2_y)+1,0+1)
-    ax3_y = [item["sum"]["cachedBytes"] for item in first_group]
-    ax3_x = range(-len(ax3_y)+1,0+1)
+    ax2_2_y = [item["sum"]["cachedBytes"] for item in first_group]
+    ax2_2_x = range(-len(ax2_2_y)+1,0+1)
 
     fig = matplotlib.figure.Figure()
     fig.suptitle(f"Stats for {zone_id}")
@@ -47,7 +47,7 @@ def index(key, email, zone_id, hours):
     ax1.plot(ax1_x, ax1_y)
     ax2.set_title("Bytes")
     ax2.plot(ax2_x, ax2_y)
-    ax2.plot(ax3_x, ax3_y)
+    ax2.plot(ax2_2_x, ax2_2_y)
 
     canvas = matplotlib.backends.backend_agg.FigureCanvasAgg(fig)
     img = io.BytesIO()
