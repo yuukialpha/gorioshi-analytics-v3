@@ -1,0 +1,31 @@
+{
+  viewer {
+    zones ( filter: { zoneTag: $zoneTag } ) {
+      httpRequests1dGroups (
+        limit: $max,
+        filter: {
+          date_geq: $start,
+          date_lt: $end,
+        },
+        orderBy: [date_ASC]
+      ) {
+        sum {
+          bytes,
+          cachedBytes,
+          cachedRequests,
+          encryptedBytes,
+          encryptedRequests,
+          pageViews,
+          requests,
+          threats,
+        }
+        uniq {
+          uniques,
+        }
+        dimensions {
+          date,
+        }
+      }
+    }
+  }
+}
