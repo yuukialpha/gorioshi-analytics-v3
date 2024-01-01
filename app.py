@@ -10,17 +10,22 @@ import matplotlib.backends.backend_agg
 
 app = flask.Flask(__name__)
 
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 600
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 600
+
+query_texts = [
+    pathlib.Path("query.txt").read_text("UTF-8"),
+    pathlib.Path("query2.txt").read_text("UTF-8"),
+]
 
 @app.route("/<key>/<email>/<zone_id>/<scale_type>/<int:scale>")
 def index(key, email, zone_id, scale_type, scale):
     if scale_type == "hourly":
-        query_path = "query.txt"
+        query_text = query_texts[0]
         before = { "hours": scale }
         method = "httpRequests1hGroups"
         fmt = lambda dt: dt.isoformat(timespec="seconds")
     elif scale_type == "daily":
-        query_path = "query2.txt"
+        query_text = query_texts[1]
         before = { "days": scale }
         method = "httpRequests1dGroups"
         fmt = lambda dt: dt.date().strftime("%Y-%m-%d")
@@ -33,7 +38,6 @@ def index(key, email, zone_id, scale_type, scale):
     })
     client = gql.Client(transport=transport)
 
-    query_text = pathlib.Path(query_path).read_text("UTF-8")
     query = gql.gql(query_text)
     params = {
         "zoneTag": zone_id,
