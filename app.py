@@ -10,8 +10,6 @@ import matplotlib.backends.backend_agg
 
 app = flask.Flask(__name__)
 
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 600
-
 query_texts = [
     pathlib.Path("query.txt").read_text("UTF-8"),
     pathlib.Path("query2.txt").read_text("UTF-8"),
@@ -72,6 +70,12 @@ def index(key, email, zone_id, scale_type, scale):
     img.seek(0)
 
     return flask.send_file(img, mimetype="image/png")
+
+@app.after_request
+def add_header(res):
+    res.headers["Cache-Control"] = "public, max-age=600, s-maxage=600"
+    res.headers["CDN-Cache-Control"] = "max-age=600"
+    return res
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="3000", debug=True)
