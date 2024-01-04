@@ -59,10 +59,10 @@ def index(key, email, zone_id, scale_type, scale):
     fig.set_size_inches(7, 7)
     ax1, ax2 = fig.subplots(2)
     ax1.set_title("Users")
-    ax1.plot(ax1_x, ax1_y)
+    ax1.plot(ax1_x, ax1_y, marker="*")
     ax2.set_title("Bytes")
-    ax2.plot(ax2_x, ax2_y)
-    ax2.plot(ax2_2_x, ax2_2_y)
+    ax2.plot(ax2_x, ax2_y, marker="*")
+    ax2.plot(ax2_2_x, ax2_2_y, marker="*")
 
     canvas = matplotlib.backends.backend_agg.FigureCanvasAgg(fig)
     img = io.BytesIO()
