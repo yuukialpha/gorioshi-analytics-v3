@@ -69,10 +69,7 @@ def index(key, email, zone_id, scale_type, scale):
     canvas.print_png(img)
     img.seek(0)
 
-    return flask.send_file(img, mimetype="image/png")
-
-@app.after_request
-def add_header(res):
+    res = flask.make_response(flask.send_file(img, mimetype="image/png"))
     res.headers["Cache-Control"] = "public, max-age=600, s-maxage=600"
     res.headers["CDN-Cache-Control"] = "max-age=600"
     return res
